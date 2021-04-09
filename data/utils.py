@@ -79,6 +79,6 @@ def load_data(crypto: str, topic: str) -> pd.DataFrame:
     return df
 
 
-def split_data(data: np.ndarray, ratio=0.80):
+def split_data(data: list, ratio=0.80):
     pivot = int(len(data)*ratio)
     return data[:pivot], data[pivot:]
