@@ -6,7 +6,7 @@ features = [allPrices]
 N = 3  # passos (dias) anteriores usados para prever o proximo. Eles serão tipo "features" do proximo passo
 foward_days = 2
 
-n_samples = len(allPrices) -N -foward_days
+n_samples = len(allPrices) -N -(foward_days-1)
 features_set = np.empty((n_samples, N, len(features)))  # type: np.ndarray
 labels = [None]*n_samples
 for i in range(n_samples):

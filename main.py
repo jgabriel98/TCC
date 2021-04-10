@@ -30,7 +30,7 @@ N = 40
 foward_days = 2  # quantos dias prever
 features = [prices, variation]
 
-n_samples = len(allPrices) -N -foward_days
+n_samples = len(allPrices) -N -(foward_days-1)
 
 # matriz de dimensao: [n_samples, N, n_features];
 features_set = np.empty((n_samples, N, len(features)))  # type: np.ndarray
