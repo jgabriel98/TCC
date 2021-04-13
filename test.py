@@ -1,3 +1,10 @@
+from data.loaders.coinmarketcalWebScrapper.coinmarketcalWebScrapper import coinmarketcalWebScrapper
+crypto = 'litecoin'
+df = coinmarketcalWebScrapper().get_past_events(crypto)
+df.to_csv('coinmarketcal-%s.csv' % crypto)
+
+exit()
+
 import numpy as np
 
 allPrices = [0,1,2,3,4,5,6,7,8,9]
