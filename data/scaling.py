@@ -1,6 +1,7 @@
 import numpy as np
 from sklearn.preprocessing import MinMaxScaler
 
+
 def scale(min_val, max_val, data: np.ndarray):
     data = data.copy()
     for i in range(data.size):
@@ -46,21 +47,21 @@ def normalize_until_current_step(data: np.ndarray) -> np.ndarray:
     return new_data, min_val, max_val
 
 
-def normalize(data: np.ndarray, range = (0,1)) -> np.ndarray:
+def normalize(data: np.ndarray, range=(0, 1)) -> np.ndarray:
     scaler = MinMaxScaler(range)
     norm_data = data.reshape(-1, 1)
 
     # Train the Scaler with training data and smooth data
     scaler.fit(norm_data)
     norm_data = scaler.transform(norm_data).reshape(-1)
-    
+
     return norm_data, scaler
 
 
-def smooth_data_curves(train_data: np.ndarray):
+def smooth_data_curves(train_data: np.ndarray) -> np.ndarray:
     EMA = 0.0
-    gamma = 0.1
-    for ti in range(11000):
+    gamma = 0.8
+    for ti in range(len(train_data)):
         EMA = gamma*train_data[ti] + (1-gamma)*EMA
         train_data[ti] = EMA
     return train_data

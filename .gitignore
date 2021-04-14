@@ -1,3 +1,5 @@
 **.csv
 /debug.log
 **/__pycache__/**
+resultados/**/*.png
+!resultados.csv

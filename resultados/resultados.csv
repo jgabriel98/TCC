@@ -1,0 +1,53 @@
+id,N,coin,epochs,features,model,test loss,train loss,cos similarity,days
+0,45,LTC,80,"prices,variation",Bidirectional(LSTM(150)) > Dense(50) > Dense(1),0.0002304128138348,0.0002514157094992,-0.3052386939525604,1
+1,45,LTC,80,"prices,variation",Bidirectional(LSTM(150)) > Dense(100) > Dense(50) > Dense(1),0.0002360113721806,0.0002685193612705,-0.1041381731629371,1
+2,15,LTC,80,"prices,variation",Bidirectional(LSTM(150)) > Dense(100) > Dense(50) > Dense(1),0.0006320895045064,0.0004283766902517,0.1264424622058868,1
+3,120,LTC,80,"prices,variation",Bidirectional(LSTM(150)) > Dense(100) > Dense(50) > Dense(1),0.0002660174504853,0.0002847561554517,-0.1803330332040786,1
+4,50,LTC,80,"prices,variation",Bidirectional(LSTM(150)) > Dense(100) > Dense(50) > Dense(1),0.0002954500669147,0.0002723099314607,0.0971699655055999,1
+5,45,BTC,80,"prices,variation",Bidirectional(LSTM(150)) > Dense(50) > Dense(1),0.0007097285124473,2.182784373871982e-05,-0.1346796602010727,1
+6,45,BTC,80,variation,Bidirectional(LSTM(150)) > Dense(50) > Dense(1),0.1434622555971145,0.0040225381962955,0.2336907088756561,1
+7,45,BTC,80,"variation, trends",Bidirectional(LSTM(150)) > Dense(50) > Dense(1),0.1378816813230514,0.0007062181830406,0.2342350631952285,1
+8,45,BTC,80,"prices,variation,trends",Bidirectional(LSTM(150)) > Dense(50) > Dense(1),0.0010984372347593,2.0472165488172323e-05,-0.0728112757205963,1
+9,45,BTC,300,"prices,variation,trends",Bidirectional(LSTM(150)) > Dropout(0.1) > Dense(100) > Dropout(0.1) > Dense(50) > Dropout(0.1) > Dense(1),0.0020758172031491,2.417925679765176e-05,0.1946682184934616,1
+10,45,BTC,200,"prices,variation,tweet",Bidirectional(LSTM(150)) > Dropout(0.1) > Dense(100) > Dense(50) > Dense(1),0.0015806229785084,2.318934457434807e-05,-0.0988489985466003,1
+11,10,BTC,200,"prices,variation,tweet",Bidirectional(LSTM(150)) > Dropout(0.1) > Dense(100) > Dense(50) > Dense(1),0.0011391076259315,2.665184547367972e-05,-0.1013017371296882,1
+12,10,BTC,200,"prices,variation,tweet",Bidirectional(LSTM(200)) > Dropout(0.1) > Dense(150) > Dense(50) > Dense(1),0.000816233921796,2.700447294046171e-05,-0.0979687720537185,1
+13,10,BTC,200,"prices,variation,tweet",Bidirectional(LSTM(300)) > Dropout(0.1) > Dense(200) > Dense(50) > Dense(1),0.0009393896907567,2.373982897552196e-05,-0.1339902877807617,1
+14,10,BTC,200,"prices,variation,tweet",Bidirectional(LSTM(300)) > Dropout(0.1) > Dense(150) > Dense(50) > Dense(1),0.0011278929887339,2.2455540602095425e-05,-0.0732073411345481,1
+15,10,BTC,200,"prices,variation,tweet",Bidirectional(LSTM(200)) > Dropout(0.1) > Dense(200) > Dense(75) > Dense(1),0.0008159283315762,2.725756530708168e-05,-0.0933018028736114,1
+16,10,BTC,200,"prices,variation,tweet",Bidirectional(LSTM(200)) > Dropout(0.1) > Dense(200) > Dense(1),0.0013439662288874,1.983982110687066e-05,0.1210825070738792,1
+17,5,BTC,200,"prices,variation,tweet",Bidirectional(LSTM(200)) > Dropout(0.1) > Dense(200) > Dense(50) > Dense(1),0.0020791140850633,2.2064334189053625e-05,0.1830279976129531,1
+18,15,BTC,200,"prices,variation,tweet",Bidirectional(LSTM(200)) > Dropout(0.1) > Dense(200) > Dense(50) > Dense(1),0.0010038927430287,2.2776463083573617e-05,-0.1035669445991516,1
+19,15,BTC,200,"prices,variation",Bidirectional(LSTM(200)) > Dropout(0.1) > Dense(150) > Dense(50) > Dense(1),0.0005107807810418,2.360290272918064e-05,-0.1266307234764099,1
+20,15,BTC,45,"prices,variation",Bidirectional(LSTM(200)) > Dropout(0.1) > Dense(150) > Dense(50) > Dense(1),0.000464545621071,2.497106288501527e-05,-0.1109227538108825,1
+21,15,BTC,45,"prices,variation",Bidirectional(LSTM(250)) > Dropout(0.1) > Dense(150) > Dense(50) > Dense(1),0.0004520723305176,2.725009835558012e-05,-0.1043936610221862,1
+22,15,BTC,45,"prices,variation",Bidirectional(LSTM(220)) > Dropout(0.1) > Dense(150) > Dense(25) > Dense(1),0.000352639297489,2.52395238931058e-05,-0.1878402233123779,1
+23,15,BTC,45,"prices,variation",Bidirectional(LSTM(220)) > Dense(150) > Dense(25) > Dense(1),0.0004097211058251,2.2161144443089142e-05,-0.162209540605545,1
+24,15,BTC,45,"prices,variation",Bidirectional(LSTM(220)) > Dropout(0.15) > Dense(150) > Dense(25) > Dense(1),0.0003354845102876,2.6032703317468983e-05,-0.1898680180311203,1
+25,15,BTC,45,"prices,variation",Bidirectional(LSTM(220)) > Dropout(0.15) > LSTM(250) > Dense(150) > Dense(25) > Dense(1),0.0006701659876853,2.3840922949602827e-05,-0.1238105967640876,1
+26,15,BTC,45,"prices,variation",Bidirectional(LSTM(500)) > Dropout(0.15) > Dense(150) > Dense(25) > Dense(1),0.0004241349815856,2.3547430828330107e-05,-0.0317081324756145,1
+27,15,BTC,45,"prices,variation",Bidirectional(LSTM(700)) > Dropout(0.15) > Dense(150) > Dense(25) > Dense(1),0.0004739894357044,4.877796527580358e-05,-0.0943368226289749,1
+28,15,BTC,35,"prices,variation",Bidirectional(LSTM(220)) > Dropout(0.15) > Dense(150) > Dense(25) > Dense(1),0.0003344657889101,3.637301779235713e-05,-0.1790715605020523,1
+29,15,BTC,40,"prices,variation",Bidirectional(LSTM(220)) > Dropout(0.15) > Dense(150) > Dense(25) > Dense(1),0.0003097964799962,2.6212044758722183e-05,-0.183721050620079,1
+30,15,BTC,40,"prices,variation",Bidirectional(LSTM(220)) > Dropout(0.15) > Dense(175) > Dense(25) > Dense(1),0.0003034343826584,2.9368266041274182e-05,-0.1853764206171035,1
+31,15,BTC,40,"prices,variation",Bidirectional(LSTM(220)) > Dropout(0.15) > Dense(200) > Dense(25) > Dense(1),0.0003155683807563,2.6878624339587983e-05,-0.1660643517971038,1
+32,15,BTC,40,"prices,variation",Bidirectional(LSTM(220)) > Dropout(0.15) > Dense(175) > Dense(15) > Dense(1),0.0003050444938708,2.7995514756185003e-05,-0.1814332008361816,1
+33,15,BTC,40,"prices,variation",Bidirectional(LSTM(220)) > Dropout(0.15) > Dense(175) > Dense(40) > Dense(1),0.0003578585747163,2.386969572398812e-05,-0.1786509156227111,1
+34,20,BTC,40,"prices,variation",Bidirectional(LSTM(220)) > Dropout(0.15) > Dense(175) > Dense(25) > Dense(1),0.0006278932560235,3.89718625228852e-05,0.2088003456592559,1
+35,15,ADA,40,"prices,variation",Bidirectional(LSTM(220)) > Dropout(0.15) > Dense(175) > Dense(25) > Dense(1),0.0017214558320119,4.31403677794151e-05,-0.092309683561325,1
+36,15,ADA,40,"prices,variation,trends",Bidirectional(LSTM(220)) > Dropout(0.15) > Dense(175) > Dense(25) > Dense(1),0.0010936598991975,5.025054269935936e-05,-0.1020585894584655,1
+37,15,ADA,40,"prices,variation,tweet",Bidirectional(LSTM(220)) > Dropout(0.15) > Dense(175) > Dense(25) > Dense(1),0.0010883492650464,4.694841845775954e-05,-0.0663867890834808,1
+38,15,ADA,40,"prices,variation,trends,tweet",Bidirectional(LSTM(220)) > Dropout(0.15) > Dense(175) > Dense(25) > Dense(1),0.0010700420243665,4.818123488803394e-05,-0.076201744377613,1
+39,25,ADA,40,"prices,variation,trends,tweet",Bidirectional(LSTM(220)) > Dropout(0.15) > Dense(175) > Dense(25) > Dense(1),0.0013901389902457,3.4935354051413015e-05,-0.1162175834178924,1
+40,40,ADA,40,"prices,variation,trends,tweet",Bidirectional(LSTM(220)) > Dropout(0.15) > Dense(175) > Dense(25) > Dense(1),0.0023373183794319,5.4766522225691006e-05,0.0447552092373371,1
+41,25,ADA,40,"prices,variation,trends",Bidirectional(LSTM(220)) > Dropout(0.15) > Dense(175) > Dense(25) > Dense(1),0.0011730039259418,3.605418169172481e-05,-0.1563873440027237,1
+42,15,ADA,40,"prices,variation,trends",Bidirectional(LSTM(250)) > Dropout(0.15) > Dense(175) > Dense(25) > Dense(1),0.0007066978141665,7.12826440576464e-05,-0.1105649396777153,1
+43,15,ADA,40,"prices,variation,trends",LSTM(250) > Dropout(0.15) > Dense(175) > Dense(25) > Dense(1),0.000651178357657,4.0949871618067846e-05,-0.2894337475299835,1
+44,15,BTC,40,"prices,variation",LSTM(220) > Dropout(0.15) > Dense(175) > Dense(25) > Dense(1),0.0003397472610231,4.33860368502792e-05,-0.1592093408107757,1
+45,15,BTC,40,"prices,variation,trends",LSTM(220) > Dropout(0.15) > Dense(175) > Dense(25) > Dense(1),0.0006301459507085,5.0622413255041465e-05,-0.0973225459456443,1
+46,15,XRP,40,"prices,variation,trends",Bidirectional(LSTM(250)) > Dropout(0.15) > Dense(175) > Dense(25) > Dense(1),0.0007663919823244,0.0001633898937143,-0.0366939716041088,1
+47,15,XRP,40,"prices,variation,trends",LSTM(250) > Dropout(0.15) > Dense(175) > Dense(25) > Dense(1),0.000624221866019,0.0001582227268954,-0.0849000662565231,1
+48,15,DOGE,40,"prices,variation,trends",LSTM(250) > Dropout(0.15) > Dense(175) > Dense(25) > Dense(1),0.0019638293888419,1.905229873955249e-05,-0.0448957718908786,1
+49,15,DOGE,40,"prices,variation,trends,tweet",LSTM(250) > Dropout(0.15) > Dense(175) > Dense(25) > Dense(1),0.0022811687085777,1.953937862708699e-05,-0.0482295341789722,1
+50,15,ADA,40,"prices,variation,trends,tweet",LSTM(250) > Dropout(0.15) > Dense(175) > Dense(25) > Dense(1),0.0007665874436497,4.061160871060565e-05,-0.2484253197908401,1
+51,15,ADA,40,"prices,variation,trends",LSTM(250) > Dropout(0.15) > Dense(175) > Dense(25) > Dense(1),0.0006511787069030106,4.094986434211023e-05,-0.28943344950675964,1
