@@ -31,7 +31,7 @@ print('Carregou dados do csv')
 plot_data([tweet, google_trends, prices, variation], legends=['tweet volume', 'google trends', 'price', '%'],
           tick=200, verticalLineAt=len(prices)*0.8, labels=df.index.date[::200], blocking=False)
 
-#input('press enter to continue')
+input('press enter to continue')
 
 # look_behind: passos (dias) anteriores usados para prever o proximo. Eles serão tipo "features" do proximo passo
 N = 15
