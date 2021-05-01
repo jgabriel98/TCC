@@ -7,7 +7,7 @@ from data.visualization import plot_data
 from data.utils import price_to_percentage, load_data, split_data, save_data, save_picture
 from data.scaling import normalize, normalize_behind, normalize_arround, smooth_data_curves
 
-from keras.losses import cosine_similarity
+from keras.losses import cosine_similarity, mean_squared_error, mean_absolute_error
 from keras.layers import LSTM, ConvLSTM2D, Dropout, Dense, Bidirectional
 from keras.models import Sequential
 import os
@@ -78,7 +78,15 @@ modelo.add(Dense(units=25))
 modelo.add(Dense(units=foward_days))  # quantidade de labels/features?
 
 
-modelo.compile(optimizer='adam', loss='mean_squared_error')  # 'cosine_similarity', 'mean_squared_error'
+def mse_and_cosine_similarity(y_true, y_pred):
+    """cacula o mse, e multiplica pelo cosine_similarity. O cosine_similarity possui range de valor entre 1 e 2, atuando como um "penalizador" """
+    cos_sim = cosine_similarity(y_true, y_pred) #values range is between -1 and 1
+    mse = mean_squared_error(y_true, y_pred)    #values range is between 0 and 1
+    cos_sim = (((cos_sim+1.)/2.)+1) #now range is between 1 and 2
+    return tf.reduce_mean(mse * cos_sim)
+
+
+modelo.compile(optimizer='adam', loss=mse_and_cosine_similarity)  # 'cosine_similarity', 'mean_squared_error'
 modelo.fit(train_X, train_y, validation_data=(test_X, test_y), epochs=40, batch_size=16)
 epochs = len(modelo.history.epoch)
 
@@ -100,6 +108,8 @@ original_vectors = [[timestep_size, test_y[i, 0] - test_y[i-1, 0]] for i in rang
 prediction_vectors = [[timestep_size, testPredict[i, 0] - test_y[i-1, 0]] for i in range(1, len(test_y))]
 cos_similarity = np.mean(cosine_similarity(original_vectors, prediction_vectors))
 print('Cosine similarity %s' % cos_similarity)
+mse = np.mean(mean_squared_error(original_vectors, prediction_vectors))
+print('Mean Square Error %s' % mse)
 
 
 ############ DISPLAYING DATA ############
@@ -112,12 +122,12 @@ for i in range(1, predictions.shape[0], foward_days):
                                             predictions[i].tolist() +
                                             [None]*(predictions.shape[0]-(i+foward_days))))
 
-count = len(foward_days_predictions)*foward_days
-if count < predictions.shape[0]:
-    count = predictions.shape[0] - foward_days
-    foward_days_predictions.append(np.array([None]*(count-1) +
-                                            [prices_test[-foward_days-1]] +
-                                            predictions[-1].tolist()))
+# count = len(foward_days_predictions)*foward_days
+# if count < predictions.shape[0]:
+#     count = predictions.shape[0] - foward_days
+#     foward_days_predictions.append(np.array([None]*(count-1) +
+#                                             [prices_test[-foward_days-1]] +
+#                                             predictions[-1].tolist()))
 
 
 fig = plot_data([prices_test] + foward_days_predictions, tick=10, legends=['actual_price', 'prediction'],

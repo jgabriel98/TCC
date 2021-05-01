@@ -50,4 +50,5 @@ id,N,coin,epochs,features,model,test loss,train loss,cos similarity,days
 48,15,DOGE,40,"prices,variation,trends",LSTM(250) > Dropout(0.15) > Dense(175) > Dense(25) > Dense(1),0.0019638293888419,1.905229873955249e-05,-0.0448957718908786,1
 49,15,DOGE,40,"prices,variation,trends,tweet",LSTM(250) > Dropout(0.15) > Dense(175) > Dense(25) > Dense(1),0.0022811687085777,1.953937862708699e-05,-0.0482295341789722,1
 50,15,ADA,40,"prices,variation,trends,tweet",LSTM(250) > Dropout(0.15) > Dense(175) > Dense(25) > Dense(1),0.0007665874436497,4.061160871060565e-05,-0.2484253197908401,1
-51,15,ADA,40,"prices,variation,trends",LSTM(250) > Dropout(0.15) > Dense(175) > Dense(25) > Dense(1),0.0006511787069030106,4.094986434211023e-05,-0.28943344950675964,1
+51,15,ADA,40,"prices,variation,trends",LSTM(250) > Dropout(0.15) > Dense(175) > Dense(25) > Dense(1),0.000651178706903,4.094986434211023e-05,-0.2894334495067596,1
+52,15,ADA,40,"prices,variation,trends",LSTM(250) > Dropout(0.15) > Dense(175) > Dense(25) > Dense(1),0.0007194555364549,3.902038588421419e-05,-0.3330831229686737,1       # aqui foi implementada a nova função de loss
