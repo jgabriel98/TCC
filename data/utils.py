@@ -5,8 +5,9 @@ import pandas as pd
 from datetime import date
 from dateutil.relativedelta import relativedelta
 
-from .loaders.bitinfochart import bitinfochartsWebScrapper
+from .loaders.bitinfochart import BitinfochartsWebScrapper
 from .loaders.googleTrends import GoogleTrends
+from .loaders.coinmarketcalWebScrapper.webScrapper import CoinmarketcalWebScrapper, eventsToTimeSerie
 
 
 def price_to_percentage(data: np.ndarray) -> np.ndarray:
@@ -56,13 +57,15 @@ def load_data(crypto: str, topic: str) -> pd.DataFrame:
         crypto: str
             abreviação/sigla da cripto moeda. Ex: btc, eth, ada
         topic: str
-            topico a pesquisar no google trends. Ex: bitcoin, ethereum, cardano
+            topico a pesquisar no google trends e no coinmarketCalendar. Ex: bitcoin, ethereum, cardano
     """
     file_name = 'bitinfochart_data-%s.csv' % crypto.upper()
     df = None
     if not os.path.exists(file_name):
-        scrapper = bitinfochartsWebScrapper()
+        scrapper = BitinfochartsWebScrapper()
         g_trends = GoogleTrends()
+        coinMarketCal = CoinmarketcalWebScrapper()
+
         df1 = scrapper.get_tweet_volume_data(crypto)
         df1['tweet_volume'] = fill_missing_data(df1.loc[:, 'tweet_volume'].to_numpy())
 
@@ -74,7 +77,13 @@ def load_data(crypto: str, topic: str) -> pd.DataFrame:
         df3 = scrapper.get_price_data(crypto)
         df3['variation (%)'] = price_to_percentage(df3.loc[:, 'price'].to_numpy())
 
+        df4 = coinMarketCal.get_all_events(crypto=topic)
+        df4 = eventsToTimeSerie(df4)
+        df4.rename(columns={'days_to_happen': 'days_to_event_happen', 'title': 'event_title',
+                            'votes': 'event_votes', 'confidence': 'event_confidence'}, inplace=True)
+
         df = pd.concat([df1, df2, df3], axis=1, join='inner').astype({'tweet_volume': float, 'trend': float})
+        df = pd.merge(left=df, right=df4, on='date', how='left')
         df.to_csv(file_name)
     else:
         df = pd.read_csv(file_name, dtype={'tweet_volume': float, 'trend': float},

@@ -10,34 +10,37 @@ from data.scaling import normalize, normalize_behind, normalize_arround, smooth_
 from keras.losses import cosine_similarity, mean_squared_error, mean_absolute_error
 from keras.layers import LSTM, ConvLSTM2D, Dropout, Dense, Bidirectional
 from keras.models import Sequential
-import os
+#import os
 import pandas as pd
 import numpy as np
 
-np.random.seed(1337)  # for reproducibility
-tf.random.set_seed(1337)
-os.environ['TF_DETERMINISTIC_OPS'] = str(1)
+#np.random.seed(1337)  # for reproducibility
+#tf.random.set_seed(1337)
+#os.environ['TF_DETERMINISTIC_OPS'] = str(1)
 
 
-coin = 'ADA'
-df = load_data(coin, 'cardano').iloc[:, :]
+coin = 'BTC'
+df = load_data(coin, 'bitcoin').iloc[:, :]
 prices = normalize(df.loc[:, 'price'].to_numpy())[0]
 variation = df.loc[:, 'variation (%)'].to_numpy()
 tweet = normalize(df.loc[:, 'tweet_volume'].to_numpy())[0]
 google_trends = normalize(df.loc[:, 'trend'].to_numpy())[0]
+event_day_count = df.loc[:, 'days_to_event_happen'].fillna(0).to_numpy()
+event_votes = normalize(df.loc[:, 'event_votes'].fillna(0).to_numpy())[0]
+event_confidence = normalize(df.loc[:, 'event_confidence'].fillna(0).to_numpy())[0]
 
 print('Carregou dados do csv')
 
 plot_data([tweet, google_trends, prices, variation], legends=['tweet volume', 'google trends', 'price', '%'],
-          tick=200, verticalLineAt=len(prices)*0.8, labels=df.index.date[::200], blocking=False)
+          tick=200, verticalLineAt=len(prices)*0.95, labels=df.index.date[::200], blocking=False)
 
 input('press enter to continue')
 
 # look_behind: passos (dias) anteriores usados para prever o proximo. Eles serão tipo "features" do proximo passo
 N = 15
 foward_days = 1  # quantos dias prever
-used_features_names = ['prices', 'variation', 'trends']
-features = [prices, variation, google_trends]
+used_features_names = ['prices', 'variation', 'trends', 'events']
+features = [prices, variation, google_trends, event_day_count, event_votes, event_confidence]
 
 n_samples = len(prices) - N - (foward_days-1)
 
@@ -53,8 +56,8 @@ for i in range(n_samples):
     labels[i] = prices[N+i: N+i+foward_days]
 labels = np.array(labels)
 
-train_X, test_X = split_data(features_set)
-train_y, test_y = split_data(labels)
+train_X, test_X = split_data(features_set, ratio=0.95)
+train_y, test_y = split_data(labels, ratio=0.95)
 
 print('Dados preparados')
 
@@ -70,9 +73,9 @@ modelo.add(Dropout(0.15))
 # modelo.add(Dropout(0.2))
 
 modelo.add(Dense(units=175))
-# modelo.add(Dropout(0.1))
+modelo.add(Dropout(0.15))
 modelo.add(Dense(units=25))
-# modelo.add(Dropout(0.1))
+modelo.add(Dropout(0.15))
 
 # 1 neuronio só pq só queremos 1 valor na saida
 modelo.add(Dense(units=foward_days))  # quantidade de labels/features?
@@ -82,12 +85,14 @@ def mse_and_cosine_similarity(y_true, y_pred):
     """cacula o mse, e multiplica pelo cosine_similarity. O cosine_similarity possui range de valor entre 1 e 2, atuando como um "penalizador" """
     cos_sim = cosine_similarity(y_true, y_pred) #values range is between -1 and 1
     mse = mean_squared_error(y_true, y_pred)    #values range is between 0 and 1
-    cos_sim = (((cos_sim+1.)/2.)+1) #now range is between 1 and 2
+    cos_sim = (((cos_sim+1.)/2.)+1.) #now range is between 1 and 2
     return tf.reduce_mean(mse * cos_sim)
 
 
-modelo.compile(optimizer='adam', loss=mse_and_cosine_similarity)  # 'cosine_similarity', 'mean_squared_error'
-modelo.fit(train_X, train_y, validation_data=(test_X, test_y), epochs=40, batch_size=16)
+opt = tf.keras.optimizers.Nadam(learning_rate=0.001)
+
+modelo.compile(optimizer=opt, loss=mse_and_cosine_similarity)  # 'cosine_similarity', 'mean_squared_error'
+modelo.fit(train_X, train_y, validation_data=(test_X, test_y), epochs=700, batch_size=16)
 epochs = len(modelo.history.epoch)
 
 print('Modelo treinado')
