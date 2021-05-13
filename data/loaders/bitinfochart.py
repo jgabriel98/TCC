@@ -4,7 +4,7 @@ import pandas as pd
 import re
 
 
-class bitinfochartsWebScrapper(object):
+class BitinfochartsWebScrapper(object):
     def __parse_strlist(self, sl):
         clean = re.sub("[\[\],\s]", "", sl)
         splitted = re.split("[\'\"]", clean)
