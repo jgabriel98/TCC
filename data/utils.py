@@ -5,7 +5,7 @@ import pandas as pd
 from datetime import date
 from dateutil.relativedelta import relativedelta
 
-from .loaders.bitinfochart import bitinfochartsWebScrapper
+from .loaders.bitinfochart import BitinfochartsWebScrapper
 from .loaders.googleTrends import GoogleTrends
 
 
@@ -61,7 +61,7 @@ def load_data(crypto: str, topic: str) -> pd.DataFrame:
     file_name = 'bitinfochart_data-%s.csv' % crypto.upper()
     df = None
     if not os.path.exists(file_name):
-        scrapper = bitinfochartsWebScrapper()
+        scrapper = BitinfochartsWebScrapper()
         g_trends = GoogleTrends()
         df1 = scrapper.get_tweet_volume_data(crypto)
         df1['tweet_volume'] = fill_missing_data(df1.loc[:, 'tweet_volume'].to_numpy())
