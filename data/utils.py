@@ -4,6 +4,7 @@ import numpy as np
 import pandas as pd
 from datetime import date
 from dateutil.relativedelta import relativedelta
+from tensorflow.python.keras import layers
 
 from .loaders.bitinfochart import BitinfochartsWebScrapper
 from .loaders.googleTrends import GoogleTrends
@@ -98,6 +99,8 @@ def split_data(data: list, ratio=0.80):
 
 def __layer_str(layer):
     def __name(layer): return type(layer).__name__
+    if __name(layer) == 'InputLayer':
+        return ''
     if hasattr(layer, 'layer'):
         return '%s(%s)' % (__name(layer), __layer_str(layer.layer))
 

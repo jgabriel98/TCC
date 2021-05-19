@@ -2,25 +2,28 @@
 # https://stackabuse.com/time-series-analysis-with-lstm-using-pythons-keras-library/
 
 
+from keras import Input
 import tensorflow as tf
 from data.visualization import plot_data
-from data.utils import price_to_percentage, load_data, split_data, save_data, save_picture
-from data.scaling import normalize, normalize_behind, normalize_arround, smooth_data_curves
+from data.utils import load_data, split_data, save_data, save_picture
+from data.scaling import normalize, smooth_data_curves
 
-from keras.losses import cosine_similarity, mean_squared_error, mean_absolute_error
-from keras.layers import LSTM, ConvLSTM2D, Dropout, Dense, Bidirectional
-from keras.models import Sequential
+from layers.attention import MultiHeadAttention
+from layers.encoding import Time2Vector
+
+from keras.losses import cosine_similarity, mean_squared_error
+from keras.layers import LSTM, Dropout, Dense, Bidirectional, Concatenate
+from keras.models import Sequential, Model
 #import os
-import pandas as pd
 import numpy as np
 
-#np.random.seed(1337)  # for reproducibility
-#tf.random.set_seed(1337)
+np.random.seed(1337)  # for reproducibility
+tf.random.set_seed(1337)
 #os.environ['TF_DETERMINISTIC_OPS'] = str(1)
 
 
-coin = 'BTC'
-df = load_data(coin, 'bitcoin').iloc[:, :]
+coin = 'ADA'
+df = load_data(coin, 'cardano').iloc[:, :]
 prices = normalize(df.loc[:, 'price'].to_numpy())[0]
 variation = df.loc[:, 'variation (%)'].to_numpy()
 tweet = normalize(df.loc[:, 'tweet_volume'].to_numpy())[0]
@@ -39,8 +42,8 @@ input('press enter to continue')
 # look_behind: passos (dias) anteriores usados para prever o proximo. Eles serão tipo "features" do proximo passo
 N = 15
 foward_days = 1  # quantos dias prever
-used_features_names = ['prices', 'variation', 'trends', 'events']
-features = [prices, variation, google_trends, event_day_count, event_votes, event_confidence]
+used_features_names = ['prices', 'variation', 'trends']
+features = [prices, variation, google_trends]
 
 n_samples = len(prices) - N - (foward_days-1)
 
@@ -61,10 +64,30 @@ train_y, test_y = split_data(labels, ratio=0.95)
 
 print('Dados preparados')
 
-modelo = Sequential()
-# layer com 100 neuronios.
-modelo.add(LSTM(units=250, return_sequences=False, input_shape=train_X.shape[1:3]))
-modelo.add(Dropout(0.15))
+# inicializa timeEmbedding e tranformers
+time_emb_layer = Time2Vector(N, linear_used_features_shape=slice(0, 1))
+attn_layer = MultiHeadAttention(d_k=64, d_v=64, n_heads=4)
+
+in_seq = Input(shape=train_X.shape[1:])
+# time_emb = time_emb_layer(in_seq)
+# x = Concatenate(axis=-1)([in_seq, time_emb])
+# x = attn_layer((x,x,x))
+x = LSTM(units=250, return_sequences=False, input_shape=train_X.shape[1:3])(in_seq)
+x = Dropout(0.15)(x)
+x = Dense(units=175)(x)
+x = Dropout(0.15)(x)
+x = Dense(units=25)(x)
+x = Dropout(0.15)(x)
+
+out = Dense(units=foward_days)(x)
+
+modelo = Model(inputs=in_seq, outputs=out)
+
+
+# modelo = Sequential()
+# # layer com 100 neuronios.
+# #modelo.add(LSTM(units=250, return_sequences=False, input_shape=train_X.shape[1:]))
+# modelo.add(Dropout(0.15))
 
 #modelo.add(Bidirectional(LSTM(units=100, input_shape=(100, len(train_X)))))
 # modelo.add(Dropout(0.2))
@@ -72,27 +95,28 @@ modelo.add(Dropout(0.15))
 #modelo.add(LSTM(units=250, return_sequences=False))
 # modelo.add(Dropout(0.2))
 
-modelo.add(Dense(units=175))
-modelo.add(Dropout(0.15))
-modelo.add(Dense(units=25))
-modelo.add(Dropout(0.15))
+# modelo.add(Dense(units=175))
+# modelo.add(Dropout(0.15))
+# modelo.add(Dense(units=25))
+# modelo.add(Dropout(0.15))
 
 # 1 neuronio só pq só queremos 1 valor na saida
-modelo.add(Dense(units=foward_days))  # quantidade de labels/features?
+# modelo.add(Dense(units=foward_days))  # quantidade de labels/features?
 
 
 def mse_and_cosine_similarity(y_true, y_pred):
     """cacula o mse, e multiplica pelo cosine_similarity. O cosine_similarity possui range de valor entre 1 e 2, atuando como um "penalizador" """
-    cos_sim = cosine_similarity(y_true, y_pred) #values range is between -1 and 1
-    mse = mean_squared_error(y_true, y_pred)    #values range is between 0 and 1
-    cos_sim = (((cos_sim+1.)/2.)+1.) #now range is between 1 and 2
+    cos_sim = cosine_similarity(y_true, y_pred)  # values range is between -1 and 1
+    mse = mean_squared_error(y_true, y_pred)  # values range is between 0 and 1
+    cos_sim = (((cos_sim+1.)/2.)+1.)  # now range is between 1 and 2
     return tf.reduce_mean(mse * cos_sim)
 
 
-opt = tf.keras.optimizers.Nadam(learning_rate=0.001)
+opt = tf.keras.optimizers.Adam(learning_rate=0.001)
 
 modelo.compile(optimizer=opt, loss=mse_and_cosine_similarity)  # 'cosine_similarity', 'mean_squared_error'
-modelo.fit(train_X, train_y, validation_data=(test_X, test_y), epochs=700, batch_size=16)
+modelo.fit(train_X, train_y, validation_data=(test_X, test_y),
+           epochs=40, batch_size=16)  # validation_data=(test_X, test_y)
 epochs = len(modelo.history.epoch)
 
 print('Modelo treinado')
@@ -137,17 +161,17 @@ for i in range(1, predictions.shape[0], foward_days):
 
 fig = plot_data([prices_test] + foward_days_predictions, tick=10, legends=['actual_price', 'prediction'],
                 colors=['b', 'r'] + ['r']*len(foward_days_predictions), blocking=False)
-save_picture('./resultados', figure=fig, name='1', coin=coin, model=modelo,
-             epochs=epochs, N=N, days=foward_days, features=used_features_names)
+# save_picture('./resultados', figure=fig, name='1', coin=coin, model=modelo,
+#              epochs=epochs, N=N, days=foward_days, features=used_features_names)
 
 # 1 day predictions
 fig = plot_data([prices_test, predictions[:, 0]], tick=10, legends=['actual_price', 'prediction'], blocking=False)
-save_picture('./resultados', figure=fig, name='2', coin=coin, model=modelo,
-             epochs=epochs, N=N, days=foward_days, features=used_features_names)
+# save_picture('./resultados', figure=fig, name='2', coin=coin, model=modelo,
+#              epochs=epochs, N=N, days=foward_days, features=used_features_names)
 
-save_data('./resultados', coin=coin, model=modelo, epochs=epochs, N=N, days=foward_days,
-          features=used_features_names, train_loss=train_score, test_loss=test_score,
-          cosine_similarity=cos_similarity)
+# save_data('./resultados', coin=coin, model=modelo, epochs=epochs, N=N, days=foward_days,
+#           features=used_features_names, train_loss=train_score, test_loss=test_score,
+#           cosine_similarity=cos_similarity)
 
 
 input('Enter para sair')

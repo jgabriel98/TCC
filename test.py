@@ -1,5 +1,8 @@
 import numpy as np
 from data.loaders.coinmarketcalWebScrapper.webScrapper import CoinmarketcalWebScrapper, eventsToTimeSerie
+
+
+
 crypto = 'litecoin'
 #df = coinmarketcalWebScrapper().get_past_events(crypto)
 #df.to_csv('coinmarketcal-%s.csv' % crypto)
@@ -10,21 +13,8 @@ df = pd.read_csv('coinmarketcal-%s.csv' % crypto, usecols=['added_date', 'event_
                 dtype={'votes': int, 'confidence': float},
                 parse_dates=['added_date', 'event_date'])
 df2 = eventsToTimeSerie(df)
-in_how_many_days_will_it_happen = []
 
-for i, evento_row in df2.iterrows():
-    event_date = evento_row['event_date']
-    added_date = evento_row['added_date']
-    if not pd.isnull(event_date):
-        in_how_many_days_will_it_happen.append((event_date - added_date).days)
-    else:
-        in_how_many_days_will_it_happen.append(-1)
 
-print(in_how_many_days_will_it_happen)
-
-df2.drop(columns='event_date')
-df2['distance'] = in_how_many_days_will_it_happen
-print(df2)
 # df3 = eventsToTimeSeries(df, orderby='event_date')
 
 # in_5_days = []
