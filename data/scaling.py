@@ -1,3 +1,4 @@
+from typing import Tuple
 import numpy as np
 from sklearn.preprocessing import MinMaxScaler
 
@@ -47,7 +48,7 @@ def normalize_until_current_step(data: np.ndarray) -> np.ndarray:
     return new_data, min_val, max_val
 
 
-def normalize(data: np.ndarray, range=(0, 1)) -> np.ndarray:
+def normalize(data: np.ndarray, range=(-1, 1)) -> Tuple[np.ndarray, MinMaxScaler]:
     scaler = MinMaxScaler(range)
     norm_data = data.reshape(-1, 1)
 

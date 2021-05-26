@@ -36,6 +36,19 @@ class BitinfochartsWebScrapper(object):
         df = pd.DataFrame(list(zip(date, price)), columns=["date", "price"])
         df['date'] = df['date'].astype('datetime64[ns]')
         return df.set_index('date')
+    
+    def get_googletrend_data(self, crypto='btc') -> pd.DataFrame:
+        dataList = self.__get_data('google_trends', crypto)
+        date, price = [], []
+        for each in dataList:
+            if (dataList.index(each) % 2) == 0:
+                date.append(each.replace('/', '-'))
+            else:
+                price.append(float(each) if each != 'null' else 0.)  # se falta o dado do preço, usa None
+
+        df = pd.DataFrame(list(zip(date, price)), columns=["date", "trend"])
+        df['date'] = df['date'].astype('datetime64[ns]')
+        return df.set_index('date')
 
     def __get_data(self, data_type, crypto):
         crypto = crypto.lower()
