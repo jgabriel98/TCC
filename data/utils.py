@@ -92,7 +92,7 @@ def eventTimeSeries_to_many(src_df: pd.DataFrame, N: int) -> pd.DataFrame:
         N: quantos dias (series temporais extras) avisar com antedencedencia da chegada de um evento
     """
     totalTimeSteps = len(src_df.index)
-    votes_in_N_days = np.zeros(shape=(N, totalTimeSteps), dtype=int)
+    votes_in_N_days = np.zeros(shape=(N, totalTimeSteps), dtype=float)
     confi_in_N_days = np.zeros(shape=(N, totalTimeSteps), dtype=float)
 
     # votes_anouncement = np.zeros(shape=(1, tipeSteps), dtype=int)
@@ -100,8 +100,8 @@ def eventTimeSeries_to_many(src_df: pd.DataFrame, N: int) -> pd.DataFrame:
 
     timeStep = 0
     for idx, row in src_df.iterrows():
-        days_to_happen, votes, confidence = row['days_to_event_happen'], row['event_votes'], row['event_confidence']
-        if pd.isnull(votes):
+        title, days_to_happen, votes, confidence = row['event_title'], row['days_to_event_happen'], row['event_votes'], row['event_confidence']
+        if pd.isnull(title):
             timeStep += 1
             continue
 
@@ -181,13 +181,15 @@ def load_data(crypto: str, topic: str, event_days_left_lookback: int = 5) -> pd.
         df = pd.merge(left=df, right=df4, on='date', how='left')
 
         df.to_csv(file_name)
-    else:
-        df = pd.read_csv(file_name, dtype={'tweet_volume': float, 'trend': float, 'event_votes': pd.Int64Dtype(), 'days_to_event_happen': pd.Int64Dtype()},
-                         parse_dates=['date']).set_index('date')
+    
 
-        df['price (%)'] = price_to_percentage(df.loc[:, 'price'].to_numpy())
+    df = pd.read_csv(file_name, dtype={'tweet_volume': float, 'trend': float, 'event_votes': pd.Int64Dtype(), 'days_to_event_happen': pd.Int64Dtype()},
+                        parse_dates=['date']).set_index('date')
 
-        df = eventTimeSeries_to_many(df, N=event_days_left_lookback)
+    df['price (%)'] = price_to_percentage(df.loc[:, 'price'].to_numpy())
+
+    df['event_votes'] = df['event_votes'].fillna(0) / df['price']   # "escala" os votos de acordo com o preço da época
+    df = eventTimeSeries_to_many(df, N=event_days_left_lookback)
 
     return df
 
