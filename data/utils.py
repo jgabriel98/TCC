@@ -189,6 +189,7 @@ def load_data(crypto: str, topic: str, event_days_left_lookback: int = 5) -> pd.
     df['price (%)'] = price_to_percentage(df.loc[:, 'price'].to_numpy())
 
     df['event_votes'] = df['event_votes'].fillna(0) / df['price']   # "escala" os votos de acordo com o preço da época
+    df['event_confidence'] = df['event_confidence'].fillna(0)
     df = eventTimeSeries_to_many(df, N=event_days_left_lookback)
 
     return df

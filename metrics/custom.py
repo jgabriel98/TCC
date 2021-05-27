@@ -21,8 +21,8 @@ def cosine_similarity(y_true, y_pred):
 
     y_true_firstColumn = y_true[:, :1]
     y_pred = tf.concat([y_true[:, :1], y_pred], axis=-1)    # junta o valor anterior com o atual previsto
-    y_pred = y_pred - y_true_firstColumn + [0.1, 0]       # move o vetor para sair da origem, e faz eixo x = 0.1
-    y_true = y_true - y_true_firstColumn + [0.1, 0]
+    y_pred = y_pred - y_true_firstColumn + [0.05, 0]       # move o vetor para sair da origem, e faz eixo x = 0.1
+    y_true = y_true - y_true_firstColumn + [0.05, 0]
 
     return keras_cosine_similarity(y_true, y_pred, axis=-1)  # values range is between -1 and 1
 
@@ -44,6 +44,8 @@ def custom_loss2(y_true, y_pred):
     c = cosine_similarity(y_true, y_pred) #valores entre  -1 e 1 (na pratica entre -1 e 0)
     c = ((c+1.)/0.25)+2 #entre 2 e 10 (na pratica 2 e 6)
     error = log_cosh(y_true[:,1:], y_pred)
+    # error = mean_squared_error(y_true, y_pred)
+
     # mse = mean_squared_error(y_true[:,1:], y_pred)
     # mov = movement_hit_or_miss(y_true, y_pred)
     # flipped_mov = (mov *-1) + 1.0
