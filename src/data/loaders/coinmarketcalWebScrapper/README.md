@@ -1,0 +1,3 @@
+# coinmarketcalWebScrapper
+## Depencencies:
+python selenium
