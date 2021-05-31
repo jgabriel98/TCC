@@ -26,6 +26,13 @@ def cosine_similarity(y_true, y_pred):
 
     return keras_cosine_similarity(y_true, y_pred, axis=-1)  # values range is between -1 and 1
 
+def custom_loss3(y_true, y_pred):
+    cos_sim = cosine_similarity(y_true, y_pred)
+    cos_sim = (cos_sim+1.)/2.
+
+    error = log_cosh(y_true[:,1:], y_pred)
+    # error = mean_squared_error(y_true, y_pred)
+    return error + tf.reduce_mean(cos_sim)
 
 def custom_loss(y_true, y_pred):
     """cacula o mse, e multiplica pelo cosine_similarity. O cosine_similarity possui range de valor entre 1 e 2, atuando como um "penalizador" """
@@ -38,13 +45,13 @@ def custom_loss(y_true, y_pred):
     cos_sim = (((cos_sim+1.)/2.)+1)  # now range is between 1 and 2
 
     # tf.reduce_mean(se*cos_sim**2) * (1.-above_or_below_zero_score(y_true, y_pred))
-    return se * K.mean(cos_sim)  # * ((1.-movement_score)**2)
+    return K.mean(se) * K.mean(cos_sim)  # * ((1.-movement_score)**2)
 
 def custom_loss2(y_true, y_pred):
     c = cosine_similarity(y_true, y_pred) #valores entre  -1 e 1 (na pratica entre -1 e 0)
-    c = ((c+1.)/2.)+1
-    error = log_cosh(y_true[:,1:], y_pred)
-    # error = mean_squared_error(y_true, y_pred)
+    c = ((c+1.)*2)+1
+    # error = log_cosh(y_true[:,1:], y_pred)
+    error = mean_squared_error(y_true, y_pred)
 
     # mse = mean_squared_error(y_true[:,1:], y_pred)
     # mov = movement_hit_or_miss(y_true, y_pred)

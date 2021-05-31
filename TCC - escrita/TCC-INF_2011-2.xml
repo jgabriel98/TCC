@@ -1,0 +1,31 @@
+<?xml version='1.0' encoding='ISO-8859-1'?>
+<documento>
+	<titulo>Título do trabalho</titulo>
+	<autores>
+		<autor>Nome do aluno</autor>
+		<autor>Nome do orientador</autor>
+		<autor>Nome do coorientador (se houver)</autor>
+	</autores>
+	<palavras-chaves>
+		<palavra-chave>Palavra-chave 1</palavra-chave>
+		<palavra-chave>Palavra-chave 2</palavra-chave>
+		<palavra-chave>Palavra-chave 3</palavra-chave>
+		<palavra-chave>Palavra-chave 4</palavra-chave>
+	</palavras-chaves>
+	<resumo> Resumo do trabalho (podem ser usadas várias linhas).
+	</resumo>
+	<contribuicoes>
+		xxxxxxxxxxxxxxxxxxxxxx
+	</contribuicoes>
+	<data>
+		<dia>dia da apresentação</dia>
+		<mes>mês da apresentação</mes>
+		<ano>ano da apresentação</ano>
+	</data>
+	<tipo>Trabalho de Conclusão de Curso</tipo>
+	<formato>PDF</formato>
+	<identificador>TCC-INF_ano-semestre (exemplo: TCC-INF_2011-2)</identificador>
+	<url>TCC-INF_ano-semestre.pdf</url>
+	<idioma>Português</idioma>
+	<direitos>Este trabalho pode ser usado irrestritamente, desde que sejam dados os devidos créditos aos seus autores</direitos>
+</documento>

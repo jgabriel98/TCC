@@ -4,3 +4,4 @@
 resultados/**/*.png
 !resultados.csv
 **/.ropeproject/**
+tmp/
