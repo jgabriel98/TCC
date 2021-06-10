@@ -4,5 +4,6 @@
     },
     "search.exclude": {
         "**/__pycache__": true
-    }
+    },
+    "jupyter.jupyterServerType": "local"
 }

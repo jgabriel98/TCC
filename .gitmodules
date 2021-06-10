@@ -1,3 +1,0 @@
-[submodule "data/loaders/coinmarketcalWebScrapper"]
-	path = data/loaders/coinmarketcalWebScrapper
-	url = https://github.com/jgabriel98/coinmarketcalWebScrapper

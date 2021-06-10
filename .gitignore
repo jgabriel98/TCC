@@ -1,5 +1,15 @@
+TCC - escrita/tese_fabricio/**
+
 **.csv
 /debug.log
 **/__pycache__/**
 resultados/**/*.png
+!resultados/generic_model/**
 !resultados.csv
+**/.ropeproject/**
+tmp/
+src/tmp_altcoins/**
+src/1.png
+src/2.png
+
+
