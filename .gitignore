@@ -6,7 +6,8 @@ resultados/**/*.png
 !resultados/generic_model/**
 !resultados.csv
 **/.ropeproject/**
-tmp/
+tmp/**
+src/tmp/**
 src/tmp_altcoins/**
 src/1.png
 src/2.png

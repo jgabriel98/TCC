@@ -13,7 +13,7 @@ from datetime import date, timedelta
 from .EventCardElement import EventCardElement
 
 
-def eventsToTimeSerie(df: pd.DataFrame, remove_zero_votes_events = False ,remove_zero_day_lenght_events=False, on_same_added_day='keep_biggest') -> pd.DataFrame:
+def eventsToTimeSerie(df: pd.DataFrame, remove_zero_day_lenght_events=False, on_same_added_day='keep_biggest') -> pd.DataFrame:
     df = df.sort_values('added_date')
     timeSerie = []
 
@@ -30,8 +30,6 @@ def eventsToTimeSerie(df: pd.DataFrame, remove_zero_votes_events = False ,remove
         if days_to_happen < 0:  # remove eventos "atrasados", isto é, que foram descobertos depois de acontecer
             continue
         if remove_zero_day_lenght_events and days_to_happen == 0:
-            continue
-        if remove_zero_votes_events and row['votes'] == 0:
             continue
          # change 'event_date' column value to 'days_to_happen' = 'event_date - added_date'
         row['event_date'] = days_to_happen
@@ -57,7 +55,7 @@ def eventsToTimeSerie(df: pd.DataFrame, remove_zero_votes_events = False ,remove
 
 class CoinmarketcalWebScrapper(object):
 
-    def __init__(self, webdriver_path='G:\\Storage\\Repos\\TCC\\src\\data\\loaders\\coinmarketcalWebScrapper\\chromedriver.exe'):
+    def __init__(self, webdriver_path='G:\\Storage\\Repos\\TCC\\data\\loaders\\coinmarketcalWebScrapper\\chromedriver.exe'):
         self.driver = webdriver.Chrome(executable_path=webdriver_path)
         self.wait = WebDriverWait(self.driver, 3)
 
