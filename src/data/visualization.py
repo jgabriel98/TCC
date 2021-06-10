@@ -5,8 +5,8 @@ import warnings
 warnings.filterwarnings('ignore', category=mplDeprecation)
 
 
-def plot_data(data_list: list, tick, labels=None, legends=None, verticalLineAt=None, colors=None, blocking=True):
-    plt.figure(figsize=(28, 10))
+def plot_data(data_list: list, tick, labels=None, legends=None, verticalLineAt=None, colors=None, blocking=True, figsize=(28,10)):
+    fig = plt.figure(figsize=figsize)
     plt.style.use('ggplot')
     if type(data_list) is not list:
         data_list = [data_list]
@@ -54,4 +54,4 @@ def plot_data(data_list: list, tick, labels=None, legends=None, verticalLineAt=N
     if verticalLineAt:
         plt.axvline(verticalLineAt, linestyle='--', c='0.5')
     plt.show(block=blocking)
-    return plt
+    return fig

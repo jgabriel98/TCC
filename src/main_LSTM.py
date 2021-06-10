@@ -36,16 +36,16 @@ os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
 
 
 
-coin = 'BTC'
-df = load_data(coin, 'bitcoin', event_days_left_lookback=5).iloc[:, :]
+coin = 'ADA'
+df = load_data(coin, 'cardano', event_days_left_lookback=5).iloc[:, :]
 
-prices, _ = normalize(df.loc[:, 'price'].to_numpy())
-variation, _ = normalize(df.loc[:, 'price (%)'].to_numpy())
+prices, prices_scaler = normalize(df.loc[:, 'price'].to_numpy())
+variation = df.loc[:, 'price'].pct_change().fillna(0).to_numpy()
 # variation, _ = normalize(df.loc[:, 'price'].pct_change().to_numpy())
-tweet, _ = normalize(df.loc[:, 'tweet_volume'].pct_change().to_numpy())
-google_trends, _ = normalize(df.loc[:, 'trend'].pct_change().to_numpy())
+tweet, _ = normalize(df.loc[:, 'tweet_volume'].pct_change().fillna(0).to_numpy())
+google_trends, _ = normalize(df.loc[:, 'trend'].pct_change().fillna(0).to_numpy())
 
-volume, _ = normalize(df['volume'].pct_change().to_numpy())
+volume, _ = normalize(df['Volume'].pct_change().to_numpy())
 # event_day_count, _ = normalize(df.loc[:, 'days_to_event_happen'].fillna(0).to_numpy())
 event_votes, votes_scaler = normalize(df.loc[:, 'event_votes'].fillna(0).to_numpy(), range=(0,1))
 event_confidence, conf_scaler = normalize(df.loc[:, 'event_confidence'].fillna(0).to_numpy(), range=(0,1))
@@ -79,8 +79,8 @@ print('Carregou dados do csv')
 N = 5
 foward_days = 1  # quantos dias prever
 used_features_names = ['tweet', 'variation', 'trends']
-features = [prices[1:],variation[1:], google_trends[1:]] + event_features
-target = prices[1:]
+features = [variation, google_trends]
+target = variation
 # features = [variation, google_trends]
 # target = variation
 
@@ -218,7 +218,7 @@ opt = tf.keras.optimizers.Adam(learning_rate=0.001, amsgrad=True)
 modelo.compile(optimizer=opt, loss=custom, metrics=['mse', log_cosh, movement_accuracy, above_or_below_zero_accuracy, cosine_similarity])# 'cosine_similarity', 'mean_squared_error'
 print(modelo.summary())
 print(f'train and test y shape = {train_y.shape} {test_y.shape}')
-modelo.fit(train_X, train_y, validation_data=(test_X, test_y), epochs=80, batch_size=128)  # validation_data=(test_X, test_y)
+modelo.fit(train_X, train_y, validation_data=(test_X, test_y), epochs=1, batch_size=64)  # validation_data=(test_X, test_y)
 epochs = len(modelo.history.epoch)
 
 print('Modelo treinado')
@@ -281,6 +281,35 @@ above_below_zero = above_or_below_zero_accuracy(test_y, testPredict).numpy()
 print('Price up or down accuracy: %s' % above_below_zero)
 
 
+def variation_to_price(base_price, prices, predictions):
+    predicted_prices = np.empty_like(predictions)
+    # n_samples = len(prices) - N - (foward_days-1)
+    last_price = base_price
+    for i in range(len(prices)):
+        predicted_prices[i] = last_price * (predictions[i] +1)
+        last_price = prices[i]
+    return predicted_prices
+
+
+def to_keras_format(features: list, target):
+    n_samples = len(target) - N - (foward_days-1)
+    # matriz de dimensao: [n_samples, N, n_features];
+    features_set = np.empty((n_samples, N, len(features)))  # type: np.ndarray
+    labels = [None]*n_samples
+    for i in range(n_samples):
+        for j in range(N):
+            for ft_idx in range(len(features)):
+                feature = features[ft_idx]
+                features_set[i, j, ft_idx] = feature[i+j]
+
+        labels[i] = target[N+i-1: N+i+foward_days]
+    labels = np.array(labels)
+
+    return features_set, labels
+
+pivot = len(train_X)
+source_prices, target_prices = to_keras_format([prices], prices)
+raw = variation_to_price(target_prices[pivot, 0], target_prices[pivot:, 1], test_y[:, 1])
 ############ DISPLAYING DATA ############
 predictions = testPredict
 targets_test = test_y[:, -1:].tolist()

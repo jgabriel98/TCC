@@ -147,6 +147,7 @@ class GoogleTrends:
                 if verbose:
                     print('found topic encode for %s: %s - type: %s' % (search_term, topic_encode, item['type']))
                 break
+            topic_encode = f'{search_term} coin'
         return topic_encode
 
     def _fetch_data(self, kw_list, timeframe, cat=0, geo='', gprop='') -> pd.DataFrame:

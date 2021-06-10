@@ -1,5 +1,7 @@
 import tensorflow as tf
 from keras.losses import cosine_similarity as keras_cosine_similarity, log_cosh
+from keras.losses import mean_absolute_percentage_error as keras_mean_absolute_percentage_error
+from keras.metrics import RootMeanSquaredError as keras_RootMeanSquaredError
 from tensorflow.python.framework import ops
 from tensorflow.python.ops import math_ops
 
@@ -15,10 +17,18 @@ def square_error(y_true, y_pred):
 def mean_squared_error(y_true, y_pred):
     return K.mean(square_error(y_true, y_pred))
 
+class RootMeanSquaredError(keras_RootMeanSquaredError):
+    """Computes root mean squared error metric between `y_true` and `y_pred`.
+    """
+    def update_state(self, y_true, y_pred, sample_weight=None):
+        return super(RootMeanSquaredError, self).update_state(y_true[:, 1:], y_pred, sample_weight=sample_weight)
+
+def mean_absolute_percentage_error(y_true, y_pred):
+    return keras_mean_absolute_percentage_error(y_true[:, 1:], y_pred)
+
 # y_pred|y_true shape = (batches, 2) --> first column is previous step label (needed to calculate cossine), second column is the label indeed
 
 def cosine_similarity(y_true, y_pred):
-
     y_true_firstColumn = y_true[:, :1]
     y_pred = tf.concat([y_true[:, :1], y_pred], axis=-1)    # junta o valor anterior com o atual previsto
     y_pred = y_pred - y_true_firstColumn + [0.1, 0]       # move o vetor para sair da origem, e faz eixo x = 0.1
@@ -26,12 +36,26 @@ def cosine_similarity(y_true, y_pred):
 
     return keras_cosine_similarity(y_true, y_pred, axis=-1)  # values range is between -1 and 1
 
+# pearson correlation coefficient
+def correlation_coefficient_loss(y_true, y_pred):
+    x = y_true[:, 1:]
+    y = y_pred
+    mx = K.mean(x)
+    my = K.mean(y)
+    xm, ym = x-mx, y-my
+    r_num = K.sum(tf.multiply(xm,ym))
+    r_den = K.sqrt(tf.multiply(K.sum(K.square(xm)), K.sum(K.square(ym))))
+    r = r_num / r_den
+
+    r = K.maximum(K.minimum(r, 1.0), -1.0)
+    return 1 - K.square(r)
+
 def custom_loss3(y_true, y_pred):
     cos_sim = cosine_similarity(y_true, y_pred)
     cos_sim = (cos_sim+1.)/2.
 
-    error = log_cosh(y_true[:,1:], y_pred)
-    # error = mean_squared_error(y_true, y_pred)
+    # error = log_cosh(y_true[:,1:], y_pred)
+    error = mean_squared_error(y_true, y_pred)
     return error + tf.reduce_mean(cos_sim)
 
 def custom_loss(y_true, y_pred):

@@ -5,13 +5,14 @@ import pandas as pd
 import pandas_ta as ta
 from datetime import date
 from dateutil.relativedelta import relativedelta
+from pandas_ta.momentum.stochrsi import stochrsi
 from tensorflow.python.keras import layers
 
 from .loaders.bitinfochart import BitinfochartsWebScrapper
 from .loaders.googleTrends import GoogleTrends
 from .loaders.coinmarketcalWebScrapper.webScrapper import CoinmarketcalWebScrapper, eventsToTimeSerie
 
-
+# obsoleto, pandas tem a função pct_change()
 def price_to_percentage(data: np.ndarray) -> np.ndarray:
     new_data = np.empty(len(data))
     new_data[0] = .0
@@ -52,15 +53,25 @@ def fill_missing_data(data: np.ndarray) -> np.ndarray:
 
 
 def add_indicadores_tecnicos(df):
-    macd = ta.macd(close=df['price'], fast=50, slow=200, signal=21, min_periods=None, append=True)
-    df = pd.concat([df, macd], axis=1)
+    # macd = ta.macd(close=df['price'], fast=50, slow=200, signal=21, min_periods=None, append=True)
+    # df = pd.concat([df, macd], axis=1)
 
-    df = df.fillna(0)
+    # df = df.fillna(0)
+    # bbands = ta.bbands(df['price'], fillna=0)
+    # df['BB_Middle_Band'] = bbands['BBM_5_2.0']
+    # df['BB_Upper_Band'] = bbands['BBU_5_2.0']
+    # df['BB_Lower_Band'] = bbands['BBL_5_2.0']
 
-    bbands = ta.bbands(df['price'], fillna=0)
-    df['BB_Middle_Band'] = bbands['BBM_5_2.0']
-    df['BB_Upper_Band'] = bbands['BBU_5_2.0']
-    df['BB_Lower_Band'] = bbands['BBL_5_2.0']
+    K_list = [7,15,30,60]
+    for k in K_list:
+        # high = df['High'].rolling(k).max()
+        # low = df['Low'].rolling(k).min()
+        stochastic = ta.stoch(df['High'], df['Low'], df['Close'], k=k)
+        df[f'STOCHk_{k}'] = stochastic[f'STOCHk_{k}_3_3']
+        df[f'RSI_{k}'] = ta.rsi(df['Close'], k)
+        stochrsi = ta.stochrsi(df['Close'], length=k, rsi_length=k)
+        df[f'STOCHRSI_{k}'] = stochrsi[f'STOCHRSIk_{k}_{k}_3_3']
+
     return df
 
 
@@ -108,12 +119,12 @@ def eventTimeSeries_to_many(src_df: pd.DataFrame, N: int) -> pd.DataFrame:
 
         diff = days_to_happen - N
         i = timeStep + max(0, diff)  # avança pra futuro, onde esta perto do evento acontecer
-        if i >= totalTimeSteps:  # verifica se o evento ta dentro do escopo da série temporal
-            timeStep += 1
-            continue
         # votes_anouncement[i] = votes
         # confi_anouncement[i] = confidence
         for timeSerie in range(N, 0, -1):
+            if i >= totalTimeSteps:  # verifica se o evento ta dentro do escopo da série temporal
+                break
+
             if timeSerie > days_to_happen:
                 continue
             old_v = votes_in_N_days[timeSerie-1, i]
@@ -147,7 +158,7 @@ def eventTimeSeries_to_many(src_df: pd.DataFrame, N: int) -> pd.DataFrame:
     return df
 
 
-def load_data(crypto: str, topic: str, event_days_left_lookback: int = 5, storage_folder='./data') -> pd.DataFrame:
+def load_data(crypto: str, topic: str, event_days_left_lookback: int = 5, storage_folder='./data', events_query=None) -> pd.DataFrame:
     """Carrega os dados.
 
     Parametros
@@ -158,33 +169,43 @@ def load_data(crypto: str, topic: str, event_days_left_lookback: int = 5, storag
             topico a pesquisar no google trends e no coinmarketCalendar. Ex: bitcoin, ethereum, cardano
         event_days_left_lookback: int
             avisar chegada de evento com quantos dias de antecedencia
+        events_query: str
+            query para pandas.DataFrame, só funciona ao gerar novo arquivo csv (caso ja tenha chamada essa função, apague os arquivos .csv dessa moeda)
     """
     social_file_name = f'{storage_folder}/social_data-{crypto.upper()}.csv'
-    kaggle_file_name = f'{storage_folder}/kaggle - Cryptocurrency Historical Prices/coin_{topic.capitalize()}.csv'
+    kaggle_file_name = f'{storage_folder}/kaggle - Cryptocurrency Historical Prices/coin_{topic[0].upper()+topic[1:]}.csv' # deixa apenas primeira letra maiscula
     if not os.path.exists(social_file_name):
         scrapper = BitinfochartsWebScrapper()
         coinMarketCal = CoinmarketcalWebScrapper()
-
-        df1 = scrapper.get_tweet_volume_data(crypto)
-        df1['tweet_volume'] = fill_missing_data(df1.loc[:, 'tweet_volume'].to_numpy())
+        df1 = None
+        try:
+            df1 = scrapper.get_tweet_volume_data(crypto)
+            df1['tweet_volume'] = fill_missing_data(df1.loc[:, 'tweet_volume'].to_numpy())
+        except:
+            df1 = None
+            pass
 
         df2 = None
         try:
             df2 = scrapper.get_googletrend_data(crypto)
         except:
-            start_date = max(df1.index.date[0], date.today() - relativedelta(years=6)
-                             )  # limita dados para no máximo ultimos 6 anos
-            df2 = GoogleTrends().get_daily_trend(topic, start_d=start_date, end_d=date.today(), verbose=True)
+            # limita dados para no máximo ultimos 6 anos
+            start_date = max(df1.index.date[0], date.today() - relativedelta(years=6)) if df1 is not None else (date.today() - relativedelta(years=4))
+            df2 = GoogleTrends().get_daily_trend(topic.lower(), start_d=start_date, end_d=date.today(), verbose=True)
             df2 = df2.drop(columns=['overlap'])
 
         # df3 = scrapper.get_price_data(crypto)
 
-        df4 = coinMarketCal.get_all_events(crypto=topic)
+        df4 = coinMarketCal.get_all_events(crypto=topic.lower())
+        df4 = df4.query(events_query)
         df4 = eventsToTimeSerie(df4, remove_zero_votes_events=True)
         df4.rename(columns={'days_to_happen': 'days_to_event_happen', 'title': 'event_title',
                             'votes': 'event_votes', 'confidence': 'event_confidence'}, inplace=True)
 
-        df = pd.concat([df1, df2], axis=1, join='inner').astype({'tweet_volume': float, 'trend': float})
+        if df1 is not None: 
+            df = pd.concat([df1, df2], axis=1, join='inner').astype({'tweet_volume': float, 'trend': float})
+        else:
+            df = df2.astype({'trend': float})
         df = pd.merge(left=df, right=df4, on='date', how='left')
 
         df.to_csv(social_file_name)
@@ -197,6 +218,7 @@ def load_data(crypto: str, topic: str, event_days_left_lookback: int = 5, storag
     df.index = df.index.normalize()  # tira a hora do datetime, deixando apenas a data
     df['price'] = (df['Open']+df['Close'])/2
     df['price (%)'] = df['price'].pct_change().fillna(0)
+    df = add_indicadores_tecnicos(df)
 
     df = pd.concat([df, df_social], axis=1, join='inner')
 
