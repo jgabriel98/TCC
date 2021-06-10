@@ -2,14 +2,14 @@ from typing import Tuple
 import numpy as np
 from sklearn.preprocessing import MinMaxScaler
 
-
+# NÃO UTILIZADO
 def scale(min_val, max_val, data: np.ndarray):
     data = data.copy()
     for i in range(data.size):
         data[i] = (data[i]-min_val)/(max_val-min_val)
     return data
 
-
+# DEPRECIADO
 def normalize_arround(data: np.ndarray, window_size: int = 700) -> np.ndarray:
     offset = window_size//2
     new_data = data.copy()
@@ -23,7 +23,7 @@ def normalize_arround(data: np.ndarray, window_size: int = 700) -> np.ndarray:
 
     return new_data, min_val, max_val
 
-
+# DEPRECIADO
 def normalize_behind(data: np.ndarray, window_size: int = 500) -> np.ndarray:
     new_data = data.copy()
 
@@ -36,7 +36,7 @@ def normalize_behind(data: np.ndarray, window_size: int = 500) -> np.ndarray:
 
     return new_data, min_val, max_val
 
-
+# DEPRECIADO
 def normalize_until_current_step(data: np.ndarray) -> np.ndarray:
     new_data = data.copy()
 
@@ -58,7 +58,7 @@ def normalize(data: np.ndarray, range=(-1, 1)) -> Tuple[np.ndarray, MinMaxScaler
 
     return norm_data, scaler
 
-
+# NÃO UTILIZADO
 def smooth_data_curves(train_data: np.ndarray) -> np.ndarray:
     EMA = 0.0
     gamma = 0.8
