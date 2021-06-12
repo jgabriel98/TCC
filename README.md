@@ -3,12 +3,16 @@
 ###### Atenção, esse repositório contém um submódulo ([coinmarketcalWebScrapper](https://github.com/jgabriel98/coinmarketcalWebScrapper/blob/master/README.md)), localizado em `./src/data/loaders/coinmarketcalWebScrapper`, caso deseje executar código deste repositório, certifique-se que o submódulo foi clonado também.
 
 ## Resultados e estatísticas
+* Comparativo pré-testes - preço "crú" VS variação do preço:
+  - estatisticas em: `./src/LSTM_BTC_raw_vs_variation.ipynb`
+  - plots (graficos) das predições: `./src/LSTM.ipynb` está mais para o inicio, acaba antes da metade
 * Modelos genéricos:
   - Plots dos resultados: `./resultados/generic_model/<moeda baseTreino> trained - <moeda alvoTeste> forecasting.png`
   - Estatísticas dos resultados: `./src/LSTM_GenericModel_<moeda baseTreino>-<moeda alvoTeste>.ipynb`
   
 * Features Adicionais:
-  - Testes com indicadores técnicos: `./src/LSTM_technicalFeatures.ipynb`
+  - Testes com indicadores técnicos (Bitcoin): `./src/LSTM_technicalFeatures.ipynb`
+  - Teste com indicadores técnidos (restante das moedas): `./src/LSTM_technicalFeatures_with_altcoins.ipynb`
   - Testes com dados sociais: `./src/LSTM.ipynb` começe olhando pelo final, pois tem muita coisa antes
 
 ## Dados
