@@ -16,8 +16,8 @@ from data.visualization import plot_data
 from data.utils import load_data, add_indicadores_tecnicos, split_data, save_data, save_picture
 from data.scaling import normalize, smooth_data_curves
 
-from layers.attention import MultiHeadAttention, TransformerEncoder
-from layers.encoding import Time2Vector,Time2Vec
+# from layers.attention import MultiHeadAttention, TransformerEncoder
+# from layers.encoding import Time2Vector,Time2Vec
 
 from keras.losses import cosine_similarity, mean_squared_error, log_cosh
 from keras.layers import LSTM, Dropout, Dense, Bidirectional, concatenate, TimeDistributed, GlobalAveragePooling1D, GlobalMaxPooling1D, LayerNormalization, Conv1D, Add
@@ -36,16 +36,19 @@ os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
 
 
 
-coin = 'ADA'
-df = load_data(coin, 'cardano', event_days_left_lookback=5).iloc[:, :]
+coin = 'BTC'
+df = load_data(coin, 'bitcoin', event_days_left_lookback=5, storage_folder='./data').iloc[:, :]
 
 prices, prices_scaler = normalize(df.loc[:, 'price'].to_numpy())
 variation = df.loc[:, 'price'].pct_change().fillna(0).to_numpy()
 # variation, _ = normalize(df.loc[:, 'price'].pct_change().to_numpy())
-tweet, _ = normalize(df.loc[:, 'tweet_volume'].pct_change().fillna(0).to_numpy())
-google_trends, _ = normalize(df.loc[:, 'trend'].pct_change().fillna(0).to_numpy())
+tweet, _ = normalize(df.loc[:, 'tweet_volume'].to_numpy())
+tweet_variation, _ = normalize(df.loc[:, 'tweet_volume'].pct_change().fillna(0).to_numpy())
+google_trends, _ = normalize(df.loc[:, 'trend'].to_numpy())
+google_trends_variation, _ = normalize(df.loc[:, 'trend'].pct_change().fillna(0).to_numpy())
 
-volume, _ = normalize(df['Volume'].pct_change().to_numpy())
+volume, _ = normalize(df['Volume'].to_numpy())
+volume_variation, _ = normalize(df['Volume'].pct_change().to_numpy())
 # event_day_count, _ = normalize(df.loc[:, 'days_to_event_happen'].fillna(0).to_numpy())
 event_votes, votes_scaler = normalize(df.loc[:, 'event_votes'].fillna(0).to_numpy(), range=(0,1))
 event_confidence, conf_scaler = normalize(df.loc[:, 'event_confidence'].fillna(0).to_numpy(), range=(0,1))
@@ -60,20 +63,24 @@ for i in range(5):
 
  
 
-df = add_indicadores_tecnicos(df)
-MACD_50_200_21, _ = normalize(df.loc[:, 'MACD_50_200_21'].to_numpy())
-MACDh_50_200_21, _ = normalize(df.loc[:, 'MACDh_50_200_21'].to_numpy())
-MACDs_50_200_21, _ = normalize(df.loc[:, 'MACDs_50_200_21'].to_numpy())
-BB_Middle_Band, _ = normalize(df.loc[:, 'BB_Middle_Band'].to_numpy())
-BB_Upper_Band, _ = normalize(df.loc[:, 'BB_Upper_Band'].to_numpy())
-BB_Lower_Band, _ = normalize(df.loc[:, 'BB_Lower_Band'].to_numpy())
+STOCHk_7, _ = normalize(df['STOCHk_7'].fillna(50.0).to_numpy())
+STOCHk_14, _ = normalize(df['STOCHk_14'].fillna(50.0).to_numpy())
+STOCHk_28, _ = normalize(df['STOCHk_28'].fillna(50.0).to_numpy())
+STOCHk_56, _ = normalize(df['STOCHk_56'].fillna(50.0).to_numpy())
+
+RSI_7, _ = normalize(df['RSI_7'].fillna(50.0).to_numpy())
+RSI_14, _ = normalize(df['RSI_14'].fillna(50.0).to_numpy())
+RSI_28, _ = normalize(df['RSI_28'].fillna(50.0).to_numpy())
+RSI_56, _ = normalize(df['RSI_56'].fillna(50.0).to_numpy())
 
 print('Carregou dados do csv')
 
-# plot_data([tweet, google_trends, prices, variation, MACD_50_200_21,MACDh_50_200_21,MACDs_50_200_21, BB_Middle_Band], legends=['tweet volume', 'google trends', 'price', '%', 'MACD', 'MCADh','MCADs', 'Bollinger bands'],
-#           tick=200, verticalLineAt=len(prices)*0.95, labels=df.index.date[::200], blocking=False)
+plot_data([tweet, google_trends, prices, variation],# STOCHk_7, STOCHk_14, STOCHk_28, STOCHk_56, RSI_7, RSI_14, RSI_28, RSI_56], 
+legends=['tweet volume', 'google trends', 'price', '%'],# 'K% (7)', 'K% (14)','K% (28)', 'K% (56)', 'RSI (7)', 'RSI (14)', 'RSI (28)', 'RSI (56)'],
+          tick=200, verticalLineAt=len(prices)*0.95, labels=df.index.date[::200], blocking=False,
+          title="Clique na linha da legenda para mostrar/esconder o dado no gráfico")
 
-# input('press enter to continue')
+input('press enter to continue (se você veio só pra ver dados, melhor fechar ao invés de dar enter, pois o código desse script já está desatualizado)')
 
 # look_behind: passos (dias) anteriores usados para prever o proximo. Eles serão tipo "features" do proximo passo
 N = 5

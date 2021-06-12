@@ -5,7 +5,7 @@ import warnings
 warnings.filterwarnings('ignore', category=mplDeprecation)
 
 
-def plot_data(data_list: list, tick, labels=None, legends=None, verticalLineAt=None, colors=None, blocking=True, figsize=(28,10)):
+def plot_data(data_list: list, tick, labels=None, legends=None, verticalLineAt=None, colors=None, blocking=True, figsize=(28,10), title=None):
     fig = plt.figure(figsize=figsize)
     plt.style.use('ggplot')
     if type(data_list) is not list:
@@ -24,8 +24,8 @@ def plot_data(data_list: list, tick, labels=None, legends=None, verticalLineAt=N
             lines.append(plt.plot(range(len(data)), data, c=color, alpha=0.6, label=label)[0])
             plt.xticks(range(0, len(data), tick), labels, rotation=45)
 
-    plt.xlabel('Date', fontsize=18)
-    plt.ylabel('Mid Price', fontsize=18)
+    plt.xlabel('TimeStep', fontsize=18)
+    plt.ylabel('Value', fontsize=18)
 
     if legends:
         leg = plt.legend()
@@ -53,5 +53,7 @@ def plot_data(data_list: list, tick, labels=None, legends=None, verticalLineAt=N
         plt.connect('pick_event', onpick)
     if verticalLineAt:
         plt.axvline(verticalLineAt, linestyle='--', c='0.5')
+    if title:
+        plt.suptitle(title)
     plt.show(block=blocking)
     return fig

@@ -62,7 +62,7 @@ def add_indicadores_tecnicos(df):
     # df['BB_Upper_Band'] = bbands['BBU_5_2.0']
     # df['BB_Lower_Band'] = bbands['BBL_5_2.0']
 
-    K_list = [7,15,30,60]
+    K_list = [7,14,28,56]
     for k in K_list:
         # high = df['High'].rolling(k).max()
         # low = df['Low'].rolling(k).min()
@@ -119,8 +119,7 @@ def eventTimeSeries_to_many(src_df: pd.DataFrame, N: int) -> pd.DataFrame:
 
         diff = days_to_happen - N
         i = timeStep + max(0, diff)  # avança pra futuro, onde esta perto do evento acontecer
-        # votes_anouncement[i] = votes
-        # confi_anouncement[i] = confidence
+
         for timeSerie in range(N, 0, -1):
             if i >= totalTimeSteps:  # verifica se o evento ta dentro do escopo da série temporal
                 break

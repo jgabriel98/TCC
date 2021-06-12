@@ -8,14 +8,33 @@ from tensorflow.python.ops import math_ops
 from tensorflow.python.keras import backend as K
 import numpy as np
 
+############ ATENÇÃO #############
+# y_pred shape = (batches, 1)
+# y_true shape = (batches, 2) --> primeira coluna é o valor(label) do passo anterior (algumas métricas precisam dele),
+#                                 a segunda coluna é o devido valor esperado desse passo
+
+
 def square_error(y_true, y_pred):
     y_pred = ops.convert_to_tensor_v2_with_dispatch(y_pred)
     y_true = math_ops.cast(y_true[:, 1:], y_pred.dtype)
     return math_ops.squared_difference(y_pred, y_true)
 
+def mean_absolute_error(y_true, y_pred):
+    y_pred = ops.convert_to_tensor_v2_with_dispatch(y_pred)
+    y_true = math_ops.cast(y_true[:, 1:], y_pred.dtype)
+    return K.mean(math_ops.abs(y_pred - y_true), axis=-1)
 
 def mean_squared_error(y_true, y_pred):
     return K.mean(square_error(y_true, y_pred))
+
+
+# SMAPE loss function - não testado
+def symmetric_mean_absolute_percentage_error(y_true, y_pred):
+    y_true = y_true[:, 1:]
+    epsilon = 0.1
+    summ = K.maximum(K.abs(y_true) + K.abs(y_pred) + epsilon, 0.5 + epsilon)
+    smape = K.abs(y_pred - y_true) / summ * 2.0
+    return smape
 
 class RootMeanSquaredError(keras_RootMeanSquaredError):
     """Computes root mean squared error metric between `y_true` and `y_pred`.
@@ -26,7 +45,7 @@ class RootMeanSquaredError(keras_RootMeanSquaredError):
 def mean_absolute_percentage_error(y_true, y_pred):
     return keras_mean_absolute_percentage_error(y_true[:, 1:], y_pred)
 
-# y_pred|y_true shape = (batches, 2) --> first column is previous step label (needed to calculate cossine), second column is the label indeed
+# y_true shape = (batches, 2) --> first column is previous step label (needed to calculate cossine), second column is the label indeed
 
 def cosine_similarity(y_true, y_pred):
     y_true_firstColumn = y_true[:, :1]

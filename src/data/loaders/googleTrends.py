@@ -1,3 +1,6 @@
+''' código obtido/inspirado em https://github.com/qztseng/google-trends-daily , 
+    então alterado, editado e adaptado para este projeto
+'''
 from datetime import datetime, timedelta, date, time
 import pandas as pd
 import time
