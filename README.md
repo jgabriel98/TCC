@@ -2,6 +2,9 @@
 
 ###### Atenção, esse repositório contém um submódulo ([coinmarketcalWebScrapper](https://github.com/jgabriel98/coinmarketcalWebScrapper/blob/master/README.md)), localizado em `./src/data/loaders/coinmarketcalWebScrapper`, caso deseje executar código deste repositório, certifique-se que o submódulo foi clonado também.
 
+## Documento pdf do TCC:
+ `./TCC/TCC - escrita/TCC_JoaoGabriel.pdf`
+
 ## Resultados e estatísticas
 * Comparativo pré-testes - preço "crú" VS variação do preço:
   - estatisticas em: `./src/LSTM_BTC_raw_vs_variation.ipynb`
@@ -27,3 +30,5 @@
   - `./src/data/loaders` contém as classes para extração de dados sociais.
   - `./src/metrics/custom.py` contém as funções das métricas, as relevantes são: `mean_squared_error()`, `custom_movement_accuracy()` e `above_or_below_zero_accuracy()`
   
+-----------------------------------
+### O restante dos arquivos não citados aqui ou não referenciados no arquivo pdf do TCC , podem estar depreciados e não remeterem à capacidade e performance do Modelo.
