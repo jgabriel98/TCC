@@ -2,8 +2,11 @@
 
 ###### Atenção, esse repositório contém um submódulo ([coinmarketcalWebScrapper](https://github.com/jgabriel98/coinmarketcalWebScrapper/blob/master/README.md)), localizado em `./src/data/loaders/coinmarketcalWebScrapper`, caso deseje executar código deste repositório, certifique-se que o submódulo foi clonado também.
 
+![ETH trained - EOS forecasting.png](resultados/generic_model/ETH%20trained%20-%20EOS%20forecasting.png)
+![results table](https://github.com/jgabriel98/TCC/assets/37881981/d625569b-93cd-4307-bb52-04e149f376d5)
+
 ## Documento pdf do TCC:
- `./TCC/TCC - escrita/TCC_JoaoGabriel.pdf`
+ [TCC_JoaoGabriel.pdf](TCC%20-%20escrita/TCC_JoaoGabriel.pdf)
 
 ## Resultados e estatísticas
 * Comparativo pré-testes - preço "crú" VS variação do preço:
